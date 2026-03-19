@@ -1,0 +1,27 @@
+# Secrets — never commit these
+.credentials.json
+*.credentials.json
+.env
+*.env.local
+
+# Claude runtime state — machine-specific, not portable
+cache/
+debug/
+file-history/
+backups/
+shell-snapshots/
+ide/
+projects/
+todos/
+plans/
+statsig/
+telemetry/
+downloads/
+plugins/
+mcp-needs-auth-cache.json
+stats-cache.json
+policy-limits.json
+
+# OS artifacts
+.DS_Store
+Thumbs.db
