@@ -51,6 +51,7 @@ link "$CLAUDE_SRC/CLAUDE.md"  "$CLAUDE_DEST/CLAUDE.md"
 link "$CLAUDE_SRC/mcp.json"   "$CLAUDE_DEST/mcp.json"
 link "$CLAUDE_SRC/docs"       "$CLAUDE_DEST/docs"
 link "$CLAUDE_SRC/skills"     "$CLAUDE_DEST/skills"
+link "$CLAUDE_SRC/agents"     "$CLAUDE_DEST/agents"
 
 echo ""
 echo "Done. All Claude config is now symlinked from:"
