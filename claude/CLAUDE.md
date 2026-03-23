@@ -77,6 +77,7 @@ All TypeScript must be written in **strict mode**. No exceptions.
 - Use `as const` objects or `const enum` — not regular enums
 - All functions must have explicit return types and access modifiers
 - Use `readonly` on interface properties and function params where appropriate
+- **One interface or type per file** — each interface/type alias lives in its own `.mts` file named after it (e.g. `Card` → `card.mts`); barrel `index.mts` re-exports all
 - All async
 
 ### Error Handling
@@ -96,7 +97,7 @@ type Result<T, E = Error> =
 - Schema-first: define schema, derive type with `z.infer<typeof schema>`
 - Validate all env vars at startup via `src/env.mts`
 - Validate all external inputs at system boundaries (API body, query, params)
-- After creating a schema create an associated type using `z.infer<typeof schema>` and save in a folder called `types`
+- After creating a schema create an associated type using `z.infer<typeof schema>` and save in a folder called `types` 
 - Add all types to a barrel
 
 ---

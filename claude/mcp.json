@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "prd-agent": {
+      "command": "bun",
+      "args": ["C:/projects/claude/src/mcp/index.mts"]
+    },
+    "ag-grid": {
+      "command": "npx",
+      "args": ["ag-mcp"]
+    }
+  }
+}
