@@ -169,7 +169,13 @@
     "ralph-loop@claude-plugins-official": true,
     "playwright@claude-plugins-official": true
   },
-  "effortLevel": "low",
   "autoUpdatesChannel": "latest",
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "env": {
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70"
+  }
 }
