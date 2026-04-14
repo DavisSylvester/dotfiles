@@ -17,7 +17,8 @@
 
 All projects use **Bun** unless a project-level `CLAUDE.md` says otherwise.
 
-- Use Winston logger for logging — no `console.log` statements
+- Use Winston logger for logging in backend services (`apps/apis/`, `libs/`) — no `console.*` statements
+- Frontend / SPA apps (Angular, etc.) may use `console.*` for logging
 
 ## TypeScript
 
