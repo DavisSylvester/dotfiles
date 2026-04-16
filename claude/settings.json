@@ -1,4 +1,11 @@
 {
+  "env": {
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "allow": [
       "Bash(curl -s http://localhost:11434/api/tags)",
@@ -163,7 +170,12 @@
       "c:\\projects\\davisSylvester\\youtube-daily-digest\\ui\\src\\app\\pages\\videos",
       "C:\\Users\\davis\\.claude",
       "C:\\Users\\davis\\dotfiles"
-    ]
+    ],
+    "defaultMode": "auto"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash /Users/dsylvester/.claude/statusline-command.sh"
   },
   "enabledPlugins": {
     "ralph-loop@claude-plugins-official": true,
@@ -171,15 +183,5 @@
   },
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  },
-  "env": {
-    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70"
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "bash /Users/dsylvester/.claude/statusline-command.sh"
-  }
+  "skipAutoPermissionPrompt": true
 }
