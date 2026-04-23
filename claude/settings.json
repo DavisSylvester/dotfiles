@@ -163,6 +163,7 @@
       "mcp__plugin_playwright_playwright__browser_snapshot",
       "Bash(curl -s http://localhost:3000/api/report-transactions/error-codes)"
     ],
+    "defaultMode": "auto",
     "additionalDirectories": [
       "c:\\projects\\davisSylvester\\youtube-daily-digest\\src",
       "c:\\projects\\davisSylvester\\youtube-daily-digest\\src\\api",
@@ -170,8 +171,7 @@
       "c:\\projects\\davisSylvester\\youtube-daily-digest\\ui\\src\\app\\pages\\videos",
       "C:\\Users\\davis\\.claude",
       "C:\\Users\\davis\\dotfiles"
-    ],
-    "defaultMode": "auto"
+    ]
   },
   "statusLine": {
     "type": "command",
@@ -183,5 +183,6 @@
   },
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "model": "haiku"
 }
