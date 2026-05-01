@@ -173,6 +173,7 @@
       "C:\\Users\\davis\\dotfiles"
     ]
   },
+  "model": "opus",
   "statusLine": {
     "type": "command",
     "command": "bash /Users/dsylvester/.claude/statusline-command.sh"
@@ -183,6 +184,6 @@
   },
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
-  "skipAutoPermissionPrompt": true,
-  "theme": "dark-ansi"
+  "theme": "dark-ansi",
+  "skipAutoPermissionPrompt": true
 }
