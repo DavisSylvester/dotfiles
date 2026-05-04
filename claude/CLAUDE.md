@@ -9,7 +9,7 @@
 ## Git
 
 - Use git flow for all git commands
-- Use conventional commits: `feat:`, `fix:`, `chore:`, `refactor:`, `test:`, `docs:`
+- Use conventional commits: `feat\`, `fix\`, `chore\`, `refactor\`, `test\`, `docs\`
 
 ## Bun
 
@@ -20,20 +20,23 @@ All projects use **Bun** unless a project-level `CLAUDE.md` says otherwise.
 - Use Winston logger for logging in backend services (`apps/apis/`, `libs/`) — no `console.*` statements
 - Frontend / SPA apps (Angular, etc.) may use `console.*` for logging
 
+## Project Structure
+> ** Full reference -> [docs/PROJECT_STRUCTURE.md](docs/project_structure.md)
+
 ## TypeScript
 
 > tsconfig baseline and file extension rules are in [docs/BUN.md](docs/bun.md).
 
 All TypeScript must be in **strict mode**. No exceptions.
 
-- **Never use `any`** — use explicit types, interfaces, or `unknown`
+- **Never use `any`** — use explicit types, interfaces, or `unknown` and try to cast to correct type when needed
 - Prefer `interface` for object shapes; `type` for unions and aliases
 - Use `satisfies` over type assertions; avoid `as` unless absolutely necessary
 - Use `as const` objects or `const enum` — not regular enums
 - All functions must have explicit return types and access modifiers
 - Use `readonly` on interface properties and function params where appropriate
 - **One interface per file** — use `i-` prefix (e.g. `i-card.mts`); group in `interfaces/` folder by feature; barrel via `index.mts`
-- Ensure `.mts` imports are switched to `.mjs` in import specifiers
+- Ensure `.mts` imports are switched to `.mts` in import specifiers
 - If imports use `.mts` extension, ensure `tsconfig.json` has `noEmit` set to `true`
 
 ### Error Handling
