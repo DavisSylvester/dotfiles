@@ -6,7 +6,7 @@ model=$(echo "$input" | jq -r '.model.display_name // ""')
 used=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
 
 # Build directory segment: show last 2 path components
-dir_display=$(echo "$cwd" | awk -F'/' '{
+dir_display=$(echo "$cwd" | awk -F'[/\\\\]' '{
   n = NF
   if (n == 0) { print "/"; exit }
   if (n == 1) { print "/"; exit }
