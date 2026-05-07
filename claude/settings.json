@@ -176,7 +176,7 @@
   "model": "opus",
   "statusLine": {
     "type": "command",
-    "command": "bash /Users/dsylvester/.claude/statusline-command.sh"
+    "command": "bash ~/dotfiles/claude/statusline-command.sh"
   },
   "enabledPlugins": {
     "ralph-loop@claude-plugins-official": true,
