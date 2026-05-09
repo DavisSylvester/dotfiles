@@ -3,6 +3,14 @@
     "ag-grid": {
       "command": "npx",
       "args": ["ag-mcp"]
+    },
+    "terraform": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "hashicorp/terraform-mcp-server:0.5.2"]
+    },
+    "aws": {
+      "command": "uvx",
+      "args": ["mcp-proxy-for-aws@latest", "https://aws-mcp.us-east-1.api.aws/mcp"]
     }
   }
 }

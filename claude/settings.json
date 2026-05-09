@@ -1,4 +1,4 @@
-{
+﻿{
   "env": {
     "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70"
   },
@@ -173,7 +173,6 @@
       "C:\\Users\\davis\\dotfiles"
     ]
   },
-  "model": "opus",
   "statusLine": {
     "type": "command",
     "command": "bash ~/dotfiles/claude/statusline-command.sh"
