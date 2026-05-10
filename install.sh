@@ -1,35 +1,53 @@
 #!/usr/bin/env bash
-# install.sh — dotfiles symlink installer
-# Works on macOS and Windows (Git Bash with Developer Mode enabled)
+# install.sh — one-time setup for ~/.claude config
+# macOS / Linux : creates symlinks into the dotfiles repo (live, zero-drift)
+# Windows       : copies into ~/.claude (no symlinks; pair with sync.sh for two-way mirror)
+#
+# Idempotent. Safe to re-run.
 set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLAUDE_SRC="$DOTFILES_DIR/claude"
 
-# Resolve home directory cross-platform
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
   HOME_DIR="$(cygpath -u "$USERPROFILE")"
+  IS_WINDOWS=true
 else
   HOME_DIR="$HOME"
+  IS_WINDOWS=false
 fi
 
 CLAUDE_DEST="$HOME_DIR/.claude"
 
+# Tracked entries — top-level paths under claude/ that get linked or copied.
+# Keep in sync with sync.sh ENTRIES array.
+ENTRIES=(
+  "CLAUDE.md"
+  "mcp.json"
+  "settings.json"
+  "docs"
+  "skills"
+  "agents"
+  "commands"
+)
+
 echo "Dotfiles dir : $DOTFILES_DIR"
 echo "Claude source: $CLAUDE_SRC"
 echo "Claude dest  : $CLAUDE_DEST"
+if $IS_WINDOWS; then echo "Mode         : copy (Windows)"; else echo "Mode         : symlink (Unix)"; fi
 echo ""
 
-# Ensure destination exists
 mkdir -p "$CLAUDE_DEST"
 
-# ---------------------------------------------------------------
-# link_file <src> <dest>
-# Backs up existing file/dir then creates symlink
-# ---------------------------------------------------------------
+# ---- Unix: symlink ----
 link() {
   local src="$1"
   local dest="$2"
+
+  if [[ ! -e "$src" ]]; then
+    echo "  [skip]   $dest  (not present in dotfiles)"
+    return
+  fi
 
   if [[ -L "$dest" ]]; then
     echo "  [skip]   $dest  (already a symlink)"
@@ -46,14 +64,40 @@ link() {
   echo "  [linked] $dest → $src"
 }
 
-echo "Linking ~/.claude files..."
-link "$CLAUDE_SRC/CLAUDE.md"      "$CLAUDE_DEST/CLAUDE.md"
-link "$CLAUDE_SRC/mcp.json"       "$CLAUDE_DEST/mcp.json"
-link "$CLAUDE_SRC/settings.json"  "$CLAUDE_DEST/settings.json"
-link "$CLAUDE_SRC/docs"           "$CLAUDE_DEST/docs"
-link "$CLAUDE_SRC/skills"         "$CLAUDE_DEST/skills"
-link "$CLAUDE_SRC/agents"         "$CLAUDE_DEST/agents"
+# ---- Windows: copy ----
+copy_entry() {
+  local src="$1"
+  local dest="$2"
 
-echo ""
-echo "Done. All Claude config is now symlinked from:"
-echo "  $CLAUDE_SRC"
+  if [[ ! -e "$src" ]]; then
+    echo "  [skip]   $dest  (not present in dotfiles)"
+    return
+  fi
+
+  if [[ -d "$src" ]]; then
+    mkdir -p "$dest"
+    cp -R "$src/." "$dest/"
+    echo "  [copied dir]  $dest"
+  else
+    cp -f "$src" "$dest"
+    echo "  [copied file] $dest"
+  fi
+}
+
+if $IS_WINDOWS; then
+  echo "Initial copy: dotfiles/claude → ~/.claude ..."
+  for entry in "${ENTRIES[@]}"; do
+    copy_entry "$CLAUDE_SRC/$entry" "$CLAUDE_DEST/$entry"
+  done
+  echo "windows" > "$CLAUDE_DEST/.dotfiles-mode"
+  echo ""
+  echo "Done (Windows copy mode). Use sync.sh going forward — it handles two-way mirror."
+else
+  echo "Linking ~/.claude → dotfiles/claude ..."
+  for entry in "${ENTRIES[@]}"; do
+    link "$CLAUDE_SRC/$entry" "$CLAUDE_DEST/$entry"
+  done
+  echo "unix-symlink" > "$CLAUDE_DEST/.dotfiles-mode"
+  echo ""
+  echo "Done (Unix symlink mode). All Claude config is symlinked from $CLAUDE_SRC"
+fi

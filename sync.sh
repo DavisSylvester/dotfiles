@@ -1,17 +1,77 @@
 #!/usr/bin/env bash
 # sync.sh — pull dotfiles, run install, email results
+#
+# macOS / Linux : symlinks make ~/.claude live, no mirror step needed.
+# Windows       : two-way copy mirror — ~/.claude → dotfiles before commit, dotfiles → ~/.claude after pull.
+#
+# set -uo (no -e): we want all steps to run even if one fails, and we capture exit codes ourselves.
 set -uo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CLAUDE_SRC="$DOTFILES_DIR/claude"
+
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
+  HOME_DIR="$(cygpath -u "$USERPROFILE")"
+  IS_WINDOWS=true
+else
+  HOME_DIR="$HOME"
+  IS_WINDOWS=false
+fi
+
+CLAUDE_DEST="$HOME_DIR/.claude"
 EMAIL="dsylvesteriii@gmail.com"
 SUBJECT="Dotfiles Sync — $(date '+%Y-%m-%d %H:%M')"
 LOG=$(mktemp)
 
+# Keep in sync with install.sh ENTRIES array.
+ENTRIES=(
+  "CLAUDE.md"
+  "mcp.json"
+  "settings.json"
+  "docs"
+  "skills"
+  "agents"
+  "commands"
+)
+
+mirror_entry() {
+  # mirror_entry <src> <dest>
+  local src="$1"
+  local dest="$2"
+  if [[ ! -e "$src" ]]; then return 0; fi
+  if [[ -d "$src" ]]; then
+    mkdir -p "$dest"
+    cp -R "$src/." "$dest/"
+  else
+    cp -f "$src" "$dest"
+  fi
+}
+
+mirror_to_dotfiles() {
+  for entry in "${ENTRIES[@]}"; do
+    mirror_entry "$CLAUDE_DEST/$entry" "$CLAUDE_SRC/$entry"
+  done
+}
+
+mirror_to_claude() {
+  for entry in "${ENTRIES[@]}"; do
+    mirror_entry "$CLAUDE_SRC/$entry" "$CLAUDE_DEST/$entry"
+  done
+}
+
 {
   echo "=== Dotfiles Sync: $(date) ==="
+  if $IS_WINDOWS; then echo "Mode: copy (Windows)"; else echo "Mode: symlink (Unix)"; fi
   echo ""
 
   cd "$DOTFILES_DIR"
+
+  # Windows: capture local ~/.claude edits into dotfiles BEFORE git ops.
+  if $IS_WINDOWS; then
+    echo "--- mirror ~/.claude → dotfiles/claude (capture local edits) ---"
+    mirror_to_dotfiles
+    echo ""
+  fi
 
   echo "--- git add & commit local changes ---"
   git add -A 2>&1
@@ -33,10 +93,19 @@ LOG=$(mktemp)
   PUSH_EXIT=$?
   echo ""
 
-  echo "--- install.sh ---"
-  /bin/bash "$DOTFILES_DIR/install.sh" 2>&1
-  INSTALL_EXIT=$?
-  echo ""
+  # Windows: apply (potentially rebased) state into ~/.claude AFTER git ops.
+  # Unix: symlinks already make ~/.claude live; no mirror needed.
+  if $IS_WINDOWS; then
+    echo "--- mirror dotfiles/claude → ~/.claude (apply remote/rebased state) ---"
+    mirror_to_claude
+    INSTALL_EXIT=$?
+    echo ""
+  else
+    echo "--- install.sh (refresh symlinks for any new tracked entries) ---"
+    /bin/bash "$DOTFILES_DIR/install.sh" 2>&1
+    INSTALL_EXIT=$?
+    echo ""
+  fi
 
   if [[ $PULL_EXIT -eq 0 && $PUSH_EXIT -eq 0 && $INSTALL_EXIT -eq 0 ]]; then
     echo "Status: SUCCESS"
@@ -97,3 +166,6 @@ fi
 # Also keep a copy in the persistent log
 cat "$LOG" >> "$DOTFILES_DIR/../.claude/dotfiles-sync.log"
 rm -f "$LOG"
+
+# Print log to stdout so the user sees the result when running interactively
+cat "$DOTFILES_DIR/../.claude/dotfiles-sync.log" | tail -50
