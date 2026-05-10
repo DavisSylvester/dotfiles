@@ -17,7 +17,9 @@ and pushes to GitHub. On macOS the path is symlinked; on Windows it's a recursiv
   user/               # user profile / preferences memories
   feedback/           # corrections, approved patterns, "do this / don't do that"
   project/            # ongoing initiatives, deadlines, stakeholders
-  reference/          # external system pointers (Linear projects, Slack channels, dashboards)
+  reference/          # external system pointers (Linear projects, Slack channels, 
+  knowledge-base/     # Knowledges bases 
+  dashboards)
 ```
 
 Each memory is a single `.md` file with this frontmatter:
