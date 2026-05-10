@@ -32,6 +32,7 @@ ENTRIES=(
   "skills"
   "agents"
   "commands"
+  ".vault"
 )
 
 mirror_entry() {

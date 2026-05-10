@@ -29,6 +29,7 @@ ENTRIES=(
   "skills"
   "agents"
   "commands"
+  ".vault"
 )
 
 echo "Dotfiles dir : $DOTFILES_DIR"
