@@ -28,6 +28,7 @@ ENTRIES=(
   "CLAUDE.md"
   "mcp.json"
   "settings.json"
+  "statusline-command.sh"
   "docs"
   "skills"
   "agents"
