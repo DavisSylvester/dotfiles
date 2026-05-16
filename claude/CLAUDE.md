@@ -5,6 +5,7 @@
 ## Security
 
 - **Never read `.env` files.** Do not read, cat, print, or display the contents of any `.env`, `.env.local`, `.env.production`, or similar environment files. Reference `.env.example` for variable names instead.
+- **Never read `.aws/` directory.** Do not read, cat, print, or display any files under `.aws/` including credentials, config, or SSO cache files.
 
 ## Custom Agents
 
