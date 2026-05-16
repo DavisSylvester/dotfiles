@@ -1,11 +1,4 @@
-﻿{
-  "env": {
-    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70"
-  },
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  },
+{
   "permissions": {
     "allow": [
       "Bash(curl -s http://localhost:11434/api/tags)",
@@ -135,7 +128,9 @@
       "Bash(tasklist /fi 'imagename eq bun.exe')",
       "Bash(Get-Process -Name bun -ErrorAction SilentlyContinue)",
       "Bash(Select-Object Id, ProcessName, StartTime)",
+      "Bash(AWS_REGION=us-east-1 aws dynamodb scan --table-name reporting-transactions --limit 2)",
       "Bash(python3 -c \"import json,sys; items=json.load\\(sys.stdin\\)[''''Items'''']; [print\\(json.dumps\\({k:list\\(v.values\\(\\)\\)[0] for k,v in i.items\\(\\) if k in [''''eventGroup'''',''''resultStatus'''',''''gsi2pk'''',''''gsi3pk'''',''''pk'''']}, indent=2\\)\\) for i in items]\")",
+      "Bash(AWS_REGION=us-east-1 aws dynamodb scan --table-name reporting-transactions --limit 1 --output json)",
       "Bash(bun remove:*)",
       "Bash(npx tsc:*)",
       "Bash(bunx ng:*)",
@@ -163,7 +158,6 @@
       "mcp__plugin_playwright_playwright__browser_snapshot",
       "Bash(curl -s http://localhost:3000/api/report-transactions/error-codes)"
     ],
-    "defaultMode": "auto",
     "additionalDirectories": [
       "c:\\projects\\davisSylvester\\youtube-daily-digest\\src",
       "c:\\projects\\davisSylvester\\youtube-daily-digest\\src\\api",
@@ -173,16 +167,22 @@
       "C:\\Users\\davis\\dotfiles"
     ]
   },
-  "statusLine": {
-    "type": "command",
-    "command": "bash ~/dotfiles/claude/statusline-command.sh"
-  },
   "enabledPlugins": {
     "ralph-loop@claude-plugins-official": true,
-    "playwright@claude-plugins-official": true
+    "playwright@claude-plugins-official": true,
+    "andrej-karpathy-skills@karpathy-skills": true,
+    "superpowers@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "karpathy-skills": {
+      "source": {
+        "source": "github",
+        "repo": "forrestchang/andrej-karpathy-skills"
+      }
+    }
   },
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark-ansi",
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "model": "sonnet"
 }

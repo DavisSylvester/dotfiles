@@ -12,8 +12,7 @@ src/
   index.mts                  # app entrypoint — mounts all routers
   api/
     <domain>/
-      router.mts             # route definitions for this domain
-      controller.mts         # HTTP handlers (orchestration only)
+      router.mts             # route definitions for this domain      
       service.mts            # business logic
       repository.mts         # data access layer
       dto.mts                # request/response types (or use packages/interfaces)
@@ -67,8 +66,8 @@ const app = new Elysia()
     app
       .use(usersRouter)
   )
-  .get('/healthz', () => ({ status: 'ok' }))
-  .get('/readyz', checkReadiness)
+  .get('/health', () => ({ status: 'ok' }))
+  .get('/ready', checkReadiness)
   .listen(3000)
 ```
 
@@ -85,16 +84,19 @@ const app = new Elysia()
 
 Every route must define schemas for `body`, `query`, and `params`. No unvalidated inputs.
 
+**Always use TypeBox. Do not import or use Zod in Elysia projects.**
+
 ```ts
 // src/api/users/schema.mts
 import { t } from 'elysia'
-import { z } from 'zod'
+import type { Static } from '@sinclair/typebox'
 
-// Using TypeBox (Elysia native)
 export const createUserSchema = t.Object({
   name: t.String({ minLength: 1 }),
   email: t.String({ format: 'email' }),
 })
+
+export type CreateUserDto = Static<typeof createUserSchema>
 
 export const getUserSchema = t.Object({
   id: t.String(),
@@ -213,6 +215,44 @@ export class UserRepository {
 - Repositories handle only data access — no business logic
 - Return domain records, not DTOs — transformation belongs in services
 - Inject DB connection via constructor
+
+### Repository Try-Catch Pattern
+
+Repositories are an external system boundary — the DB can fail for reasons outside your control (timeouts, constraint violations, connection drops). All repository methods that call the database **must** be wrapped in `try/catch` and return a `Result<T, E>` type.
+
+```ts
+type Result<T, E = Error> =
+  | { ok: true; value: T }
+  | { ok: false; error: E }
+
+async findById(id: string): Promise<Result<Survey, DbError>> {
+  try {
+    const row = await this.db.query(...);
+    return { ok: true, value: row };
+  } catch (e) {
+    return { ok: false, error: toDbError(e) };
+  }
+}
+```
+
+**Rules:**
+- Every repository method must return `Result<T, DbError>` — never throw raw DB/ORM errors
+- The `catch` block must translate the error into a typed domain error — do not re-throw the raw error
+- Do not swallow errors silently (e.g. `catch { return null }`)
+- Services receive the `Result` and decide how to respond — retry, fallback, surface as 503, etc.
+- Raw ORM/driver errors must never leak past the repository layer
+
+**What to avoid:**
+```ts
+// Bad — swallows the error, breaks callers
+try { ... } catch { return null; }
+
+// Bad — re-throws raw with no translation or benefit
+try { ... } catch (e) { throw e; }
+
+// Bad — throws a domain error instead of returning Result
+try { ... } catch (e) { throw new NotFoundException(); }
+```
 
 ---
 
