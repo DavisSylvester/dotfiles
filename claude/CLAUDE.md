@@ -72,13 +72,14 @@ All TypeScript must be in **strict mode**. No exceptions.
 - Standalone components only (no NgModules)
 - Separate HTML and stylesheet files (no inline templates or styles)
 - Use Angular CLI for scaffolding
-- No paid UI libraries — prefer plain CSS or Angular Material
+- No paid UI libraries — prefer plain SCSS or Angular Material
 
 ## Styles
 
-- SCSS only — no plain CSS
+- SCSS perferred — no plain CSS
 - CSS variables for theming
 - Flexbox for layout
+- Perfer SCSS over Tailwind
 
 ## Azure
 
@@ -134,4 +135,12 @@ Applies to any code generation / modification against an HTTP API project (Elysi
 
 ## Windows
 
-- Do NOT use `mkdir -p` when making a directory on Windows
+- ** Use relative paths **
+- ** Don't use drive letters **
+
+## Security
+
+  - **Never read `.env` files.** Do not read, cat, print, or display the contents of any `.env`, `.env.local`,
+  `.env.production`, or similar environment files. Reference `.env.example` for variable names instead.
+  - **Never read `.aws/` directory.** Do not read, cat, print, or display any files under `.aws/` including credentials,
+   config, or SSO cache files.
