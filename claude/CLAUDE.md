@@ -2,6 +2,10 @@
 
 > Machine-wide defaults. Project-level `CLAUDE.md` overrides where needed.
 
+## Security
+
+- **Never read `.env` files.** Do not read, cat, print, or display the contents of any `.env`, `.env.local`, `.env.production`, or similar environment files. Reference `.env.example` for variable names instead.
+
 ## Custom Agents
 
 - **`oda-agent`** — Autonomous code generation agent. Generates a PRD, breaks it into ordered tasks, then runs a Worker→Reviewer loop per task until all pass. Invoke for end-to-end feature implementation.
