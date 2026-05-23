@@ -1,0 +1,3 @@
+[submodule "humanizer"]
+	path = claude/skills/humanizer
+	url = ../../blader/humanizer.git
