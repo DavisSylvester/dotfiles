@@ -182,5 +182,9 @@
   },
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline-command.sh"
+  }
 }
