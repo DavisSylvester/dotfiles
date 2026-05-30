@@ -167,7 +167,11 @@
       "C:\\Users\\davis\\dotfiles"
     ]
   },
+<<<<<<< HEAD
+  "model": "opus",
+=======
   "model": "sonnet",
+>>>>>>> 749abab (chore: auto-sync davis-laptop2 2026-05-29 23:47)
   "enabledPlugins": {
     "ralph-loop@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
@@ -184,10 +188,14 @@
   },
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
-  "agentPushNotifEnabled": true,
+<<<<<<< HEAD
   "skipAutoPermissionPrompt": true,
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline-command.sh"
   }
+=======
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true
+>>>>>>> 749abab (chore: auto-sync davis-laptop2 2026-05-29 23:47)
 }
