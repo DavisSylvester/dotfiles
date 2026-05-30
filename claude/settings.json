@@ -188,14 +188,10 @@
   },
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
-<<<<<<< HEAD
+  "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline-command.sh"
   }
-=======
-  "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true
->>>>>>> 749abab (chore: auto-sync davis-laptop2 2026-05-29 23:47)
 }
