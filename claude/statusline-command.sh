@@ -1,23 +1,19 @@
 #!/usr/bin/env bash
-input=$(cat)
-
-cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd // ""')
-model=$(echo "$input" | jq -r '.model.display_name // ""')
-used=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
-
-# Build directory segment: show last 2 path components
-dir_display=$(echo "$cwd" | awk -F'[/\\\\]' '{
-  n = NF
-  if (n == 0) { print "/"; exit }
-  if (n == 1) { print "/"; exit }
-  if (n == 2) { print $2; exit }
-  print $(n-1) "/" $n
-}')
-
-# Context usage segment (only when data is available)
-ctx_segment=""
-if [ -n "$used" ]; then
-  ctx_segment=" | ctx: $(printf '%.0f' "$used")%"
-fi
-
-printf '%s | %s%s' "$dir_display" "$model" "$ctx_segment"
+# Status line for Claude Code. Reads session JSON on stdin, prints "dir | model | ctx: N%".
+# Uses node (present on all machines) instead of jq, so it works on macOS/Linux/Windows
+# without an external dependency.
+node -e '
+  let raw = "";
+  process.stdin.on("data", (d) => (raw += d));
+  process.stdin.on("end", () => {
+    let j = {};
+    try { j = JSON.parse(raw); } catch {}
+    const cwd = (j.workspace && j.workspace.current_dir) || j.cwd || "";
+    const model = (j.model && j.model.display_name) || "";
+    const used = j.context_window && j.context_window.used_percentage;
+    const p = cwd.split(/[\\/]+/).filter(Boolean);
+    const dir = p.length <= 1 ? (p[0] || "/") : p.slice(-2).join("/");
+    const ctx = used != null && used !== "" ? ` | ctx: ${Math.round(used)}%` : "";
+    process.stdout.write(`${dir} | ${model}${ctx}`);
+  });
+'
