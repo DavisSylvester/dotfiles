@@ -154,7 +154,9 @@
       "mcp__plugin_playwright_playwright__browser_network_requests",
       "mcp__plugin_playwright_playwright__browser_press_key",
       "mcp__plugin_playwright_playwright__browser_snapshot",
-      "Bash(curl -s http://localhost:3000/api/report-transactions/error-codes)"
+      "Bash(curl -s http://localhost:3000/api/report-transactions/error-codes)",
+      "Bash(ls -la \"c:\\\\projects\\\\davaco\\\\ctv2026\")",
+      "Read(//c/projects/davaco/ctv2026/**)"
     ],
     "additionalDirectories": [
       "c:\\projects\\davisSylvester\\youtube-daily-digest\\src",
@@ -165,7 +167,7 @@
       "C:\\Users\\davis\\dotfiles"
     ]
   },
-  "model": "opus",
+  "model": "sonnet",
   "enabledPlugins": {
     "ralph-loop@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
@@ -182,6 +184,7 @@
   },
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
+  "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "statusLine": {
     "type": "command",

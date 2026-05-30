@@ -7,6 +7,8 @@ Personal Claude Code configuration — synced across Windows, Linux, and Mac via
 ```
 claude/
   CLAUDE.md                        # Global development standards
+  commands/
+    fix-pr.md                      # /fix-pr — ESLint fix + type-check across full PR scope
   docs/
     bun.md                         # Bun runtime & toolchain reference
     elysia.md                      # Elysia API framework reference
@@ -46,6 +48,7 @@ mv ~/.claude/memory ~/.claude/memory.bak 2>/dev/null
 
 # Create symlinks
 ln -sf ~/dotfiles/claude/CLAUDE.md ~/.claude/CLAUDE.md
+ln -sf ~/dotfiles/claude/commands ~/.claude/commands
 ln -sf ~/dotfiles/claude/docs ~/.claude/docs
 ln -sf ~/dotfiles/claude/skills ~/.claude/skills
 ln -sf ~/dotfiles/claude/memory ~/.claude/memory
@@ -61,6 +64,7 @@ Rename-Item "$env:USERPROFILE\.claude\memory" "memory.bak" -ErrorAction Silently
 
 # Create symlinks
 New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.claude\CLAUDE.md"  -Target "$env:USERPROFILE\dotfiles\claude\CLAUDE.md"
+New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.claude\commands"    -Target "$env:USERPROFILE\dotfiles\claude\commands"
 New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.claude\docs"        -Target "$env:USERPROFILE\dotfiles\claude\docs"
 New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.claude\skills"      -Target "$env:USERPROFILE\dotfiles\claude\skills"
 New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.claude\memory"      -Target "$env:USERPROFILE\dotfiles\claude\memory"
