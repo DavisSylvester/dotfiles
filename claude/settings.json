@@ -167,7 +167,25 @@
       "~/dotfiles"
     ]
   },
-  "model": "opus",
+  "model": "sonnet",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'src=\"$HOME/dotfiles/claude/statusline-command.sh\"; dst=\"$HOME/.claude/statusline-command.sh\"; [ -f \"$dst\" ] || { [ -f \"$src\" ] && cp \"$src\" \"$dst\"; }; [ -f \"$dst\" ] && chmod +x \"$dst\"; exit 0'",
+            "timeout": 10,
+            "statusMessage": "Ensuring status line script"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline-command.sh"
+  },
   "enabledPlugins": {
     "ralph-loop@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
@@ -185,23 +203,5 @@
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline-command.sh"
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash -c 'src=\"$HOME/dotfiles/claude/statusline-command.sh\"; dst=\"$HOME/.claude/statusline-command.sh\"; [ -f \"$dst\" ] || { [ -f \"$src\" ] && cp \"$src\" \"$dst\"; }; [ -f \"$dst\" ] && chmod +x \"$dst\"; exit 0'",
-            "timeout": 10,
-            "statusMessage": "Ensuring status line script"
-          }
-        ]
-      }
-    ]
-  }
+  "skipAutoPermissionPrompt": true
 }
