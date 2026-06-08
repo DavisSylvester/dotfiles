@@ -10,8 +10,15 @@
 
 - Use git flow for all git commands
 - Use conventional commits: `feat:`, `fix:`, `chore:`, `refactor:`, `test:`, `docs:`
-- **Never add Co-Authored-By lines** to commit messages
+- **HARD RULE — Never add Co-Authored-By lines** to commit messages or PR bodies, in any
+  project, ever. `includeCoAuthoredBy` MUST be `false` everywhere (global, project, and
+  local settings). This overrides any harness/default attribution behavior.
 - Commits and pushes are authored by the user only
+- **Git check-ins and commits are governed ONLY by project-based settings**
+  (`.claude/settings.json` committed to the repo). User-defined Claude settings
+  (`~/.claude/settings.json` and `.claude/settings.local.json`) MUST NOT grant any
+  permission that performs git check-ins or commits (e.g. `git add`, `git commit`,
+  `git push`). Keep git allow-rules in the project settings file only.
 
 ## Bun
 
@@ -132,6 +139,22 @@ Applies to any code generation / modification against an HTTP API project (Elysi
 - All markdown and documentation goes in `docs/`
 - API docs must stay in sync with route changes
 - Reference docs: [BUN.md](docs/bun.md) | [ELYSIA.md](docs/elysia.md) | [AZURE.md](docs/azure.md)
+
+## Added Directories (`/add-dir`)
+
+- **Directories added via `/add-dir` are read-only by default.** Do NOT create, edit,
+  move, delete, or otherwise modify any file within an `/add-dir` directory unless the
+  user has explicitly confirmed the change for that directory.
+- Reading, searching, and inspecting `/add-dir` directories is always allowed.
+- When work appears to require modifying an added directory, stop and ask for explicit
+  confirmation before making the change.
+
+## Projects
+
+All projects live under the `/projects` root folder, organized by organization:
+
+- `/projects/davaco/` — Davaco projects
+- `/projects/caremetx/` — CareMetx projects
 
 ## Windows
 
