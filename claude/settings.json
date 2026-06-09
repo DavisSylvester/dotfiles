@@ -1,4 +1,11 @@
 {
+  "env": {
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "permissions": {
     "allow": [
       "Bash(curl -s http://localhost:11434/api/tags)",
@@ -8,7 +15,7 @@
       "Read(//c/Program Files/**)",
       "Read(//c/Users/davis/AppData/Local//**)",
       "Read(//c/Users/davis/AppData/Roaming//**)",
-      "Read(~/**)",
+      "Read(//c/Users/davis//**)",
       "Bash(curl -s http://192.168.128.230:11434/api/tags)",
       "Bash(netsh interface portproxy add v4tov4 listenport=11434 listenaddress=127.0.0.1 connectport=11434 connectaddress=192.168.128.230)",
       "Bash(node -e \"const d=require\\(''fs''\\).readFileSync\\(''/dev/stdin'',''utf8''\\); const m=JSON.parse\\(d\\).models; m.forEach\\(x=>console.log\\(x.name, x.details.parameter_size\\)\\)\")",
@@ -154,54 +161,31 @@
       "mcp__plugin_playwright_playwright__browser_network_requests",
       "mcp__plugin_playwright_playwright__browser_press_key",
       "mcp__plugin_playwright_playwright__browser_snapshot",
-      "Bash(curl -s http://localhost:3000/api/report-transactions/error-codes)",
-      "Bash(ls -la \"c:\\\\projects\\\\davaco\\\\ctv2026\")",
-      "Read(//c/projects/davaco/ctv2026/**)"
+      "Bash(curl -s http://localhost:3000/api/report-transactions/error-codes)"
     ],
+    "defaultMode": "auto",
     "additionalDirectories": [
       "c:\\projects\\davisSylvester\\youtube-daily-digest\\src",
       "c:\\projects\\davisSylvester\\youtube-daily-digest\\src\\api",
       "c:\\projects\\davisSylvester\\youtube-daily-digest\\ui\\src\\app\\services",
       "c:\\projects\\davisSylvester\\youtube-daily-digest\\ui\\src\\app\\pages\\videos",
-      "~/.claude",
-      "~/dotfiles"
-    ]
-  },
-  "model": "sonnet",
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash -c 'src=\"$HOME/dotfiles/claude/statusline-command.sh\"; dst=\"$HOME/.claude/statusline-command.sh\"; [ -f \"$dst\" ] || { [ -f \"$src\" ] && cp \"$src\" \"$dst\"; }; [ -f \"$dst\" ] && chmod +x \"$dst\"; exit 0'",
-            "timeout": 10,
-            "statusMessage": "Ensuring status line script"
-          }
-        ]
-      }
+      "C:\\Users\\davis\\.claude",
+      "C:\\Users\\davis\\dotfiles",
+      "D:\\projects\\davaco\\ctv2026-mobile-apps"
     ]
   },
   "statusLine": {
     "type": "command",
-    "command": "~/.claude/statusline-command.sh"
+    "command": "bash ~/dotfiles/claude/statusline-command.sh"
   },
   "enabledPlugins": {
     "ralph-loop@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
-    "andrej-karpathy-skills@karpathy-skills": true,
     "superpowers@claude-plugins-official": true
-  },
-  "extraKnownMarketplaces": {
-    "karpathy-skills": {
-      "source": {
-        "source": "github",
-        "repo": "forrestchang/andrej-karpathy-skills"
-      }
-    }
   },
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
+  "theme": "dark-ansi",
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true
 }

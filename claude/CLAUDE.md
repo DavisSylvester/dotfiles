@@ -10,15 +10,6 @@
 
 - Use git flow for all git commands
 - Use conventional commits: `feat:`, `fix:`, `chore:`, `refactor:`, `test:`, `docs:`
-- **HARD RULE — Never add Co-Authored-By lines** to commit messages or PR bodies, in any
-  project, ever. `includeCoAuthoredBy` MUST be `false` everywhere (global, project, and
-  local settings). This overrides any harness/default attribution behavior.
-- Commits and pushes are authored by the user only
-- **Git check-ins and commits are governed ONLY by project-based settings**
-  (`.claude/settings.json` committed to the repo). User-defined Claude settings
-  (`~/.claude/settings.json` and `.claude/settings.local.json`) MUST NOT grant any
-  permission that performs git check-ins or commits (e.g. `git add`, `git commit`,
-  `git push`). Keep git allow-rules in the project settings file only.
 
 ## Bun
 
@@ -26,7 +17,8 @@
 
 All projects use **Bun** unless a project-level `CLAUDE.md` says otherwise.
 
-- Use Winston logger for logging — no `console.log` statements
+- Use Winston logger for logging in backend services (`apps/apis/`, `libs/`) — no `console.*` statements
+- Frontend / SPA apps (Angular, etc.) may use `console.*` for logging
 
 ## TypeScript
 
@@ -39,7 +31,7 @@ All TypeScript must be in **strict mode**. No exceptions.
 - Use `satisfies` over type assertions; avoid `as` unless absolutely necessary
 - Use `as const` objects or `const enum` — not regular enums
 - All functions must have explicit return types and access modifiers
-- Use `readonly` on interface properties only when explicitly required — do not add readonly by default
+- Use `readonly` on interface properties and function params where appropriate
 - **One interface per file** — use `i-` prefix (e.g. `i-card.mts`); group in `interfaces/` folder by feature; barrel via `index.mts`
 - Ensure `.mts` imports are switched to `.mjs` in import specifiers
 - If imports use `.mts` extension, ensure `tsconfig.json` has `noEmit` set to `true`
@@ -50,14 +42,11 @@ All TypeScript must be in **strict mode**. No exceptions.
 - Reserve `throw` for truly unexpected errors
 - Prefer typed error classes over generic `Error`
 
-### Validation with TypeBox
+### Validation with Zod
 
-- **Use TypeBox for all schema validation. Do not use Zod.**
-- Elysia routes: use `t` from `'elysia'` for body/query/params. Elysia's runtime validation is TypeBox-native.
-- Env validation: use `Value.Parse()` from `@sinclair/typebox/value`.
-- Mongo parse-on-read, internal contracts, anywhere a runtime schema is needed: TypeBox.
-- Schema-first: define schema, derive type with `Static<typeof schema>` from `'@sinclair/typebox'`.
-- Save derived types in a `types/` folder with a barrel export.
+- Schema-first: define schema, derive type with `z.infer<typeof schema>`
+- Validate all external inputs at system boundaries (API body, query, params)
+- Save derived types in a `types/` folder with a barrel export
 
 ## Architecture & Dependency Injection
 
@@ -79,14 +68,14 @@ All TypeScript must be in **strict mode**. No exceptions.
 - Standalone components only (no NgModules)
 - Separate HTML and stylesheet files (no inline templates or styles)
 - Use Angular CLI for scaffolding
-- No paid UI libraries — prefer plain SCSS or Angular Material
+- No paid UI libraries — prefer plain CSS or Angular Material
 
 ## Styles
 
-- SCSS perferred — no plain CSS
+- At the start of every project, ask the user: **SCSS or Tailwind?** These are the only two options — no plain CSS, no other frameworks
+- SCSS is the recommended default; pick Tailwind only when the user prefers utility-first styling
 - CSS variables for theming
 - Flexbox for layout
-- Perfer SCSS over Tailwind
 
 ## Azure
 
@@ -95,7 +84,7 @@ All TypeScript must be in **strict mode**. No exceptions.
 ## Code Formatting
 
 - Blank line after class opening brace and before first property/method
-- Double quotes for strings
+- Single quotes for strings
 - Trailing commas in multiline expressions
 - Arrow functions for callbacks
 - Named exports over default exports
@@ -113,57 +102,12 @@ All TypeScript must be in **strict mode**. No exceptions.
 - Tests must be isolated, deterministic, and well-documented
 - Identify and fill coverage gaps
 
-## API Generation & Verification
-
-Applies to any code generation / modification against an HTTP API project (Elysia, Express, Fastify, Azure Functions HTTP, etc.).
-
-### 🚨 Health endpoints — read this every time
-
-- **Use `/health` for liveness and `/ready` for readiness. Never `/healthz`, never `/readyz`. No exceptions.**
-- This applies everywhere a health endpoint is referenced: Elysia / Express / Fastify route handlers, Dockerfile `HEALTHCHECK CMD`, Kubernetes / ACA probes, GitHub Actions smoke checks, `proxy.conf.json`, terminal `curl` commands, README snippets, comments, and chat output.
-- The Kubernetes-style `/healthz` / `/readyz` convention is in your training data because it dominates k8s manifests — that does not make it correct here. If you find yourself typing `healthz`, stop and use `health`. If you encounter an existing `/healthz` reference while editing nearby code, fix it as part of the same change.
-
-### Verification
-
-- **A passing `bun test` is not sufficient.** Unit tests that stub the container do not prove the app can boot.
-- After any codegen pass on an API, the server **must actually start** and `/health` (liveness) plus `/openapi.json` (spec path) must return 200 before the task is considered complete. Add `/ready` (readiness — pings real deps) alongside.
-- Prefer one of these patterns, in priority order:
-  1. A socket-bound boot test inside `bun test` that calls `.listen(0)`, issues real `fetch` requests, and tears the server down. No env-var dependency.
-  2. A `bun run smoke` script that does the same and exits 0/1.
-  3. A chained `bun run verify` script (`type-check && lint && test && smoke`) that agents run as the single finish gate.
-- **Missing env vars are a blocker, not a skip.** If the real entrypoint (`src/index.mts` or equivalent) cannot boot because required env is absent, report that as a blocker and point at the offending keys. Do not declare success.
-- Do not fall back to `app.handle(new Request(...))` as the only boot evidence — that path never binds a socket and will pass even when `.listen()` would throw.
-
 ## Docs
 
 - All markdown and documentation goes in `docs/`
 - API docs must stay in sync with route changes
 - Reference docs: [BUN.md](docs/bun.md) | [ELYSIA.md](docs/elysia.md) | [AZURE.md](docs/azure.md)
 
-## Added Directories (`/add-dir`)
-
-- **Directories added via `/add-dir` are read-only by default.** Do NOT create, edit,
-  move, delete, or otherwise modify any file within an `/add-dir` directory unless the
-  user has explicitly confirmed the change for that directory.
-- Reading, searching, and inspecting `/add-dir` directories is always allowed.
-- When work appears to require modifying an added directory, stop and ask for explicit
-  confirmation before making the change.
-
-## Projects
-
-All projects live under the `/projects` root folder, organized by organization:
-
-- `/projects/davaco/` — Davaco projects
-- `/projects/caremetx/` — CareMetx projects
-
 ## Windows
 
-- ** Use relative paths **
-- ** Don't use drive letters **
-
-## Security
-
-  - **Never read `.env` files.** Do not read, cat, print, or display the contents of any `.env`, `.env.local`,
-  `.env.production`, or similar environment files. Reference `.env.example` for variable names instead.
-  - **Never read `.aws/` directory.** Do not read, cat, print, or display any files under `.aws/` including credentials,
-   config, or SSO cache files.
+- Do NOT use `mkdir -p` when making a directory on Windows
