@@ -164,4 +164,52 @@ Before any Azure deployment, invoke the deployment best practice tool (see table
 - [ ] Application Insights connection string is set
 - [ ] Health check endpoints (`/healthz`, `/readyz`) are reachable
 - [ ] Environment variables are validated at startup
+
+---
+
+## SPA Auth with Microsoft Entra (MSAL)
+
+Two distinct failure modes both surface as "can't sign in / blank page" but have different signatures and fixes. A bare or misconfigured app registration causes silent failures even when the client config is perfect.
+
+### Problem 1 — Unsubstituted config placeholders baked into the build
+
+- **Symptom:** redirect to `login.microsoftonline.com/<tenant-placeholder>/...&client_id=<placeholder>`; Entra returns `AADSTS90013: Invalid input received from the user`.
+- **Cause:** SPA auth config (authority/tenant, clientId) lives in a **build-time** file with template placeholders that were never replaced before the image was built. There is no runtime substitution, so the literal `<...>` strings ship in the JS bundle.
+- **Fix:** inject real values before build, or — better — load config at **runtime** (e.g. a `config.json` fetched in an app initializer) so one image works across environments.
+- **Note:** tenant id and SPA client id are **not secrets** (visible in any browser); only the API audience/issuer are validated server-side.
+
+### Problem 2 — Redirect response never processed → `interaction_in_progress`
+
+- **Symptom:** sign-in at Entra succeeds, you land back on the app to a blank page; console shows `BrowserAuthError: interaction_in_progress` thrown from `loginRedirect`.
+- **Cause:** in the redirect flow MSAL sets an `interaction.status` flag when `loginRedirect()` starts and only clears it when `handleRedirectPromise()` runs on the return trip. A **custom auth guard that calls `loginRedirect()` but never calls `handleRedirectPromise()`** (i.e. not using the framework's built-in guard / redirect component) leaves the auth code unexchanged, no account cached, and the flag stuck — so the guard re-fires login and throws.
+- **Fix:** process the redirect response on **every page load, before routing/guards run**, e.g. in an app initializer:
+  ```
+  await instance.initialize();                 // msal-browser v3+ requires this first
+  const res = await instance.handleRedirectPromise();
+  const account = res?.account ?? instance.getAllAccounts()[0] ?? null;
+  if (account) instance.setActiveAccount(account);   // so the HTTP interceptor can get tokens
+  ```
+- **Gotcha:** stale `interaction.status` from a prior failed attempt persists in local/session storage — always verify a fix in a **fresh incognito window** (or clear site data), or you'll re-trigger the old error and think the fix failed.
+
+### The app registration must actually be provisioned
+
+For a SPA + API, the registration needs all of:
+
+- **SPA platform redirect URI** = the app's exact origin + path (e.g. `https://app.example.com/`).
+- **Application ID URI** (e.g. `api://<name>`) **and an exposed delegated scope** (e.g. `access_as_user`) — the scope the SPA requests must resolve to a real exposed scope.
+- **`requestedAccessTokenVersion: 2`** for MSAL.js (v2) tokens.
+- **Pre-authorize** the SPA client for the scope to skip the consent screen.
+- The **API validates the token `aud`** (= the App ID URI / scope resource) **and `issuer`** (tenant); keep both in sync with what the SPA requests.
+
+### Key-components checklist (don't repeat the mistake)
+
+- [ ] No `<placeholder>` strings in the shipped bundle (grep the built JS to confirm).
+- [ ] Auth config injected at runtime, or real values committed **before** the image build.
+- [ ] `handleRedirectPromise()` (or the framework's built-in guard / redirect component) runs on every load.
+- [ ] `initialize()` awaited before any MSAL call (v3+).
+- [ ] Active account set after the redirect so token acquisition works.
+- [ ] App registration: SPA redirect URI + App ID URI + exposed scope + token v2 + pre-auth.
+- [ ] API `aud`/`issuer` match the SPA's requested scope/tenant; secret-sourced config can be overridden by an explicit env var — know which one wins.
+- [ ] API CORS allows the SPA origin.
+- [ ] Verified in a clean (incognito) browser session to rule out stale MSAL state.
 - [ ] No `console.log` in production paths — use structured logger
