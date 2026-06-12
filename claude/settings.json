@@ -181,7 +181,16 @@
   "enabledPlugins": {
     "ralph-loop@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true
+    "superpowers@claude-plugins-official": true,
+    "document-skills@anthropic-agent-skills": true
+  },
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    }
   },
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
