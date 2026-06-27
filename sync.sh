@@ -68,6 +68,15 @@ mirror_to_claude() {
 
   cd "$DOTFILES_DIR"
 
+  # Safety: clear any leftover rebase state from a previous interrupted run,
+  # so a sync never starts on top of a half-finished rebase (which would leave
+  # conflict markers in tracked files).
+  if [[ -d "$DOTFILES_DIR/.git/rebase-merge" || -d "$DOTFILES_DIR/.git/rebase-apply" ]]; then
+    echo "WARNING: a previous rebase was left in progress — aborting it before sync."
+    git rebase --abort 2>&1 || true
+    echo ""
+  fi
+
   # Windows: capture local ~/.claude edits into dotfiles BEFORE git ops.
   if $IS_WINDOWS; then
     echo "--- mirror ~/.claude → dotfiles/claude (capture local edits) ---"
@@ -90,29 +99,46 @@ mirror_to_claude() {
   PULL_EXIT=$?
   echo ""
 
-  echo "--- git push ---"
-  git push origin main 2>&1
-  PUSH_EXIT=$?
-  echo ""
-
-  # Windows: apply (potentially rebased) state into ~/.claude AFTER git ops.
-  # Unix: symlinks already make ~/.claude live; no mirror needed.
-  if $IS_WINDOWS; then
-    echo "--- mirror dotfiles/claude → ~/.claude (apply remote/rebased state) ---"
-    mirror_to_claude
-    INSTALL_EXIT=$?
-    echo ""
+  if [[ $PULL_EXIT -ne 0 ]]; then
+    # HARDENING: a failed pull --rebase leaves conflict markers in the working
+    # tree. Mirroring that state back into ~/.claude is exactly what corrupts
+    # live config (settings.json, CLAUDE.md). On any rebase failure, abort the
+    # rebase to restore a clean tree and SKIP both push and the mirror-back.
+    echo "!!! git pull --rebase FAILED — aborting rebase; ~/.claude will NOT be touched."
+    if [[ -d "$DOTFILES_DIR/.git/rebase-merge" || -d "$DOTFILES_DIR/.git/rebase-apply" ]]; then
+      git rebase --abort 2>&1 \
+        && echo "Rebase aborted; repo restored to its pre-pull commit (your local commit is preserved)."
+    fi
+    PUSH_EXIT=1
+    INSTALL_EXIT=0
   else
-    echo "--- install.sh (refresh symlinks for any new tracked entries) ---"
-    /bin/bash "$DOTFILES_DIR/install.sh" 2>&1
-    INSTALL_EXIT=$?
+    echo "--- git push ---"
+    git push origin main 2>&1
+    PUSH_EXIT=$?
     echo ""
+
+    # Windows: apply (rebased) state into ~/.claude AFTER git ops.
+    # Unix: symlinks already make ~/.claude live; no mirror needed.
+    if $IS_WINDOWS; then
+      echo "--- mirror dotfiles/claude → ~/.claude (apply remote/rebased state) ---"
+      mirror_to_claude
+      INSTALL_EXIT=$?
+      echo ""
+    else
+      echo "--- install.sh (refresh symlinks for any new tracked entries) ---"
+      /bin/bash "$DOTFILES_DIR/install.sh" 2>&1
+      INSTALL_EXIT=$?
+      echo ""
+    fi
   fi
 
   if [[ $PULL_EXIT -eq 0 && $PUSH_EXIT -eq 0 && $INSTALL_EXIT -eq 0 ]]; then
     echo "Status: SUCCESS"
   else
     echo "Status: FAILED (pull=$PULL_EXIT, push=$PUSH_EXIT, install=$INSTALL_EXIT)"
+    if [[ $PULL_EXIT -ne 0 ]]; then
+      echo "  -> Rebase conflict: resolve manually (cd \"$DOTFILES_DIR\"; git pull --rebase origin main; fix conflicts; git push), then re-run sync. ~/.claude was left untouched this run."
+    fi
   fi
 
   echo "=== Done: $(date) ==="
