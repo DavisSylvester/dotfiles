@@ -6,6 +6,25 @@
 
 - **`oda-agent`** — Autonomous code generation agent. Generates a PRD, breaks it into ordered tasks, then runs a Worker→Reviewer loop per task until all pass. Invoke for end-to-end feature implementation.
 
+## Auth0 (SPA + API)
+
+- **Browser SPAs use the Auth0 "Single Page Application" app type** — a public client with
+  PKCE. **No client secret in the browser**; never embed `AUTH0_CLIENT_SECRET` in a web
+  build. A `client_secret` present usually means the app was created as a *Regular Web
+  Application* — the wrong type for a browser SPA.
+- **Required values:** `AUTH0_DOMAIN` (tenant issuer), `AUTH0_CLIENT_ID` (the SPA app),
+  and `AUTH0_AUDIENCE`.
+- **`AUTH0_AUDIENCE` comes from a separately-created Auth0 _API_ (resource server)
+  Identifier — NOT the application.** Create the API under Applications → APIs; its
+  Identifier is the audience and becomes the JWT `aud` claim. Without an API/audience the
+  SPA only receives an opaque token, not a JWT a backend can validate.
+- SPA requests its access token with `authorizationParams.audience = AUTH0_AUDIENCE`.
+  Backends validate the JWT against the tenant JWKS
+  (`https://<AUTH0_DOMAIN>/.well-known/jwks.json`), checking `iss = https://<AUTH0_DOMAIN>/`
+  and `aud = AUTH0_AUDIENCE` (use `jose`: `createRemoteJWKSet` + `jwtVerify`; never a static secret).
+- Set the application's Allowed Callback / Logout / Web Origins to every origin
+  (production + `http://localhost:<port>` for dev).
+
 ## Git
 
 - Use git flow for all git commands
@@ -29,9 +48,14 @@ All TypeScript must be in **strict mode**. No exceptions.
 - **Never use `any`** — use explicit types, interfaces, or `unknown`
 - Prefer `interface` for object shapes; `type` for unions and aliases
 - Use `satisfies` over type assertions; avoid `as` unless absolutely necessary
-- Use `as const` objects or `const enum` — not regular enums
+- Use `as const` objects — not regular enums
 - All functions must have explicit return types and access modifiers
+<<<<<<< HEAD
 - Use `readonly` on interface properties and function params where appropriate
+=======
+- All variables must have explicit types
+- Use `readonly` on interface properties only when explicitly required — do not add readonly by default
+>>>>>>> 1944bd6 (chore: auto-sync davis-laptop2 2026-06-24 20:59)
 - **One interface per file** — use `i-` prefix (e.g. `i-card.mts`); group in `interfaces/` folder by feature; barrel via `index.mts`
 - Ensure `.mts` imports are switched to `.mjs` in import specifiers
 - If imports use `.mts` extension, ensure `tsconfig.json` has `noEmit` set to `true`

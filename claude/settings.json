@@ -1,11 +1,13 @@
 {
+  "tui": "fullscreen",
   "env": {
-    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "70"
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "50"
   },
   "attribution": {
     "commit": "",
     "pr": ""
   },
+  "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
       "Bash(curl -s http://localhost:11434/api/tags)",
@@ -35,8 +37,6 @@
       "Read(//tmp/**)",
       "Bash(curl -s http://localhost:3000)",
       "Bash(echo \"exit: $?\")",
-      "Bash(git push origin main)",
-      "Bash(git add infrastructure/terraform/ctv2026/envs/production/main.tf .github/workflows/deploy.yml)",
       "Bash(bun init -y)",
       "Bash(mkdir -p src)",
       "Bash(mv index.ts src/index.mts)",
@@ -161,7 +161,12 @@
       "mcp__plugin_playwright_playwright__browser_network_requests",
       "mcp__plugin_playwright_playwright__browser_press_key",
       "mcp__plugin_playwright_playwright__browser_snapshot",
-      "Bash(curl -s http://localhost:3000/api/report-transactions/error-codes)"
+      "Bash(curl -s http://localhost:3000/api/report-transactions/error-codes)",
+      "Bash(ls -la \"c:\\\\projects\\\\davaco\\\\ctv2026\")",
+      "Read(//c/projects/davaco/ctv2026/**)",
+      "Skill(claude-api)",
+      "Skill(claude-api:*)",
+      "Bash(gh pr *)"
     ],
     "defaultMode": "auto",
     "additionalDirectories": [
@@ -174,7 +179,20 @@
       "D:\\projects\\davaco\\ctv2026-mobile-apps"
     ]
   },
-  "model": "sonnet",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'src=\"$HOME/dotfiles/claude/statusline-command.sh\"; dst=\"$HOME/.claude/statusline-command.sh\"; [ -f \"$dst\" ] || { [ -f \"$src\" ] && cp \"$src\" \"$dst\"; }; [ -f \"$dst\" ] && chmod +x \"$dst\"; exit 0'",
+            "timeout": 10,
+            "statusMessage": "Ensuring status line script"
+          }
+        ]
+      }
+    ]
+  },
   "statusLine": {
     "type": "command",
     "command": "bash ~/dotfiles/claude/statusline-command.sh"
@@ -196,7 +214,8 @@
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark-ansi",
+  "skipWorkflowUsageWarning": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "tui": "fullscreen"
+  "model": "sonnet"
 }
