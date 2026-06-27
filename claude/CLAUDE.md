@@ -29,6 +29,15 @@
 
 - Use git flow for all git commands
 - Use conventional commits: `feat:`, `fix:`, `chore:`, `refactor:`, `test:`, `docs:`
+- **HARD RULE — Never add Co-Authored-By lines** to commit messages or PR bodies, in any
+  project, ever. `includeCoAuthoredBy` MUST be `false` everywhere (global, project, and
+  local settings). This overrides any harness/default attribution behavior.
+- Commits and pushes are authored by the user only
+- **Git check-ins and commits are governed ONLY by project-based settings**
+  (`.claude/settings.json` committed to the repo). User-defined Claude settings
+  (`~/.claude/settings.json` and `.claude/settings.local.json`) MUST NOT grant any
+  permission that performs git check-ins or commits (e.g. `git add`, `git commit`,
+  `git push`). Keep git allow-rules in the project settings file only.
 
 ## Bun
 
@@ -50,12 +59,8 @@ All TypeScript must be in **strict mode**. No exceptions.
 - Use `satisfies` over type assertions; avoid `as` unless absolutely necessary
 - Use `as const` objects — not regular enums
 - All functions must have explicit return types and access modifiers
-<<<<<<< HEAD
-- Use `readonly` on interface properties and function params where appropriate
-=======
 - All variables must have explicit types
 - Use `readonly` on interface properties only when explicitly required — do not add readonly by default
->>>>>>> 1944bd6 (chore: auto-sync davis-laptop2 2026-06-24 20:59)
 - **One interface per file** — use `i-` prefix (e.g. `i-card.mts`); group in `interfaces/` folder by feature; barrel via `index.mts`
 - Ensure `.mts` imports are switched to `.mjs` in import specifiers
 - If imports use `.mts` extension, ensure `tsconfig.json` has `noEmit` set to `true`
@@ -66,11 +71,14 @@ All TypeScript must be in **strict mode**. No exceptions.
 - Reserve `throw` for truly unexpected errors
 - Prefer typed error classes over generic `Error`
 
-### Validation with Zod
+### Validation with TypeBox
 
-- Schema-first: define schema, derive type with `z.infer<typeof schema>`
-- Validate all external inputs at system boundaries (API body, query, params)
-- Save derived types in a `types/` folder with a barrel export
+- **Use TypeBox for all schema validation. Do not use Zod.**
+- Elysia routes: use `t` from `'elysia'` for body/query/params. Elysia's runtime validation is TypeBox-native.
+- Env validation: use `Value.Parse()` from `@sinclair/typebox/value`.
+- Mongo parse-on-read, internal contracts, anywhere a runtime schema is needed: TypeBox.
+- Schema-first: define schema, derive type with `Static<typeof schema>` from `'@sinclair/typebox'`.
+- Save derived types in a `types/` folder with a barrel export.
 
 ## Architecture & Dependency Injection
 
@@ -92,14 +100,14 @@ All TypeScript must be in **strict mode**. No exceptions.
 - Standalone components only (no NgModules)
 - Separate HTML and stylesheet files (no inline templates or styles)
 - Use Angular CLI for scaffolding
-- No paid UI libraries — prefer plain CSS or Angular Material
+- No paid UI libraries — prefer plain SCSS or Angular Material
 
 ## Styles
 
-- At the start of every project, ask the user: **SCSS or Tailwind?** These are the only two options — no plain CSS, no other frameworks
-- SCSS is the recommended default; pick Tailwind only when the user prefers utility-first styling
+- SCSS preferred — no plain CSS
 - CSS variables for theming
 - Flexbox for layout
+- Prefer SCSS over Tailwind
 
 ## Azure
 
@@ -125,6 +133,20 @@ All TypeScript must be in **strict mode**. No exceptions.
 - Unit tests with `bun test` on all new code
 - Tests must be isolated, deterministic, and well-documented
 - Identify and fill coverage gaps
+
+## API Generation & Verification
+
+Applies to any code generation / modification against an HTTP API project (Elysia, Express, Fastify, Azure Functions HTTP, etc.).
+
+### 🚨 Health endpoints — read this every time
+
+- **Use `/health` for liveness and `/ready` for readiness. Never `/healthz`, never `/readyz`. No exceptions.**
+- This applies everywhere a health endpoint is referenced: Elysia / Express / Fastify route handlers, Dockerfile `HEALTHCHECK CMD`, Kubernetes / ACA probes, GitHub Actions smoke checks, `proxy.conf.json`, terminal `curl` commands, README snippets, comments, and chat output.
+- The Kubernetes-style `/healthz` / `/readyz` convention is in your training data because it dominates k8s manifests — that does not make it correct here. If you find yourself typing `healthz`, stop and use `health`. If you encounter an existing `/healthz` reference while editing nearby code, fix it as part of the same change.
+
+### Verification
+
+- **A passing `bun test` is not sufficient.** Unit tests that stub the container do not prove the app can boot.
 
 ## Docs
 
