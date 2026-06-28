@@ -2,6 +2,16 @@ Update API documentation (OpenAPI + Postman) and save a conversation log.
 
 Run this skill after commits, pushes, or at the end of a conversation session.
 
+## Repo anchor
+
+**All files written by this skill must live inside the git repo being worked on.** Determine the repo root first and use it as the base for every path:
+
+```bash
+REPO_ROOT=$(git rev-parse --show-toplevel)
+```
+
+Never write files outside `$REPO_ROOT` — not in dotfiles, not in `~/.claude`, not in any other repo.
+
 ## Arguments
 
 - `$ARGUMENTS` — optional: service name to scope updates (e.g. `survey-definition-service`). If omitted, detect from changed files.
@@ -65,7 +75,7 @@ git config user.email | cut -d@ -f1
 date +%Y-%m-%d
 ```
 
-Create a conversation log at `.ai/conversations/<user>-<date>.md` with the following sections:
+Create a conversation log at `$REPO_ROOT/.ai/conversations/<user>-<date>.md` with the following sections:
 
 ```markdown
 # Conversation Log — <user> — <date>
