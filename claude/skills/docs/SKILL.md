@@ -30,13 +30,32 @@ If the service is not running, read the route files in `apps/apis/<service>/src/
 
 ## Step 3: Update Postman collection (per service)
 
-For each affected service:
+Collections always live at the **project root** under `docs/postman/` — never inside a service's own folder tree.
 
-1. Read the existing Postman collection at `apps/apis/<service>/tests/postman/ctv2026.postman_collection.json` (if it exists)
-2. Generate a new collection from the OpenAPI spec (`apps/apis/<service>/openapi.json`)
-3. Merge: preserve existing folder structure, test scripts, and pre-request scripts from the old collection. Add new endpoints, update changed endpoints, remove endpoints no longer in the spec.
-4. Write the merged collection back to `apps/apis/<service>/tests/postman/ctv2026.postman_collection.json`
-5. Follow the convention: one folder per feature, never put requests at the top level.
+### Detect repo type first
+
+```bash
+# Mono repo: has an apps/ directory with multiple service subdirectories
+ls apps/apis/ 2>/dev/null | wc -l
+```
+
+- **Mono repo** (2+ services under `apps/apis/`): path is `docs/postman/<service>/<feature>/<feature>.postman_collection.json`
+- **Single-service repo**: path is `docs/postman/<service>/<service>.postman_collection.json`
+
+The filename reflects the **purpose** of what is being tested — never a project code name or date. Use the service or feature name (e.g. `brand.postman_collection.json`, `agent-api.postman_collection.json`).
+
+The `<feature>` is derived from the changed route file name or the route prefix (e.g. `admin-logos-router.mts` → feature `brand`; `conversations-router.mts` → feature `conversations`).
+
+The collection's internal `info.name` should also reflect the purpose: `<Service> — <Feature>` (e.g. `"Agent API — Brand"`).
+
+### Steps (per service)
+
+1. Determine the collection path using the rule above
+2. Read the existing collection at that path (if it exists)
+3. Generate a new collection from the OpenAPI spec (`apps/apis/<service>/openapi.json`)
+4. Merge: preserve existing folder structure, test scripts, and pre-request scripts from the old collection. Add new endpoints, update changed endpoints, remove endpoints no longer in the spec.
+5. Write the merged collection back to the determined path
+6. Follow the convention: one folder per feature inside the collection, never put requests at the top level.
 
 ## Step 4: Save conversation log
 
