@@ -44,12 +44,13 @@ file to each channel's webhook / email.
 3. Dispatch to any channel whose webhook/recipient is configured (each is
    independent and best-effort — skip silently if its env var is unset):
    ```bash
-   # Teams
+   # Teams — note the charset=utf-8 (cards contain —, ·, …, emoji; Power Automate
+   # rejects them with HTTP 400 "Unable to translate bytes [E2]" without it)
    [ -n "$POWER_AUTOMATE_WEBHOOK_URL" ] && curl -fsS -X POST "$POWER_AUTOMATE_WEBHOOK_URL" \
-     -H "Content-Type: application/json" --data-binary @dns-report/card.json || true
+     -H "Content-Type: application/json; charset=utf-8" --data-binary @dns-report/card.json || true
    # Slack
    [ -n "$SLACK_WEBHOOK_URL" ] && curl -fsS -X POST "$SLACK_WEBHOOK_URL" \
-     -H "Content-Type: application/json" --data-binary @dns-report/slack.json || true
+     -H "Content-Type: application/json; charset=utf-8" --data-binary @dns-report/slack.json || true
    # Email (SMTP via curl; HTML body, text fallback exists as report.txt)
    if [ -n "$NOTIFY_EMAIL_TO" ] && [ -n "$SMTP_URL" ]; then
      { printf 'From: %s\nTo: %s\nSubject: %s\nMIME-Version: 1.0\nContent-Type: text/html; charset=UTF-8\n\n' \
@@ -59,6 +60,16 @@ file to each channel's webhook / email.
    fi
    ```
    (Teams = `card.json`, Slack = `slack.json`, email = `report.html`/`report.txt`.)
+
+   **PowerShell `Invoke-RestMethod`** mangles the UTF‑8 body (HTTP 400 byte `[E2]`).
+   Send raw bytes with an explicit charset instead:
+   ```powershell
+   $bytes = [IO.File]::ReadAllBytes("$env:TEMP\dns-report\card.json")
+   Invoke-RestMethod -Method POST -Uri $env:POWER_AUTOMATE_WEBHOOK_URL `
+     -ContentType 'application/json; charset=utf-8' -Body $bytes
+   ```
+   Power Automate webhook URLs must be **complete** — include `&sv=…&sig=…`; a URL
+   missing the `sig` returns HTTP 401 `DirectApiAuthorizationRequired`.
 
 ## Details JSON schema
 

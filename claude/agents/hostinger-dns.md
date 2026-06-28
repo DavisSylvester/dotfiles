@@ -308,7 +308,7 @@ summary (operation, domain, records changed, result).
 Posts an Adaptive Card via the Power Automate "workflows" envelope:
 ```bash
 if [[ -n "${POWER_AUTOMATE_WEBHOOK_URL:-}" ]]; then
-  curl -fsS -X POST "$POWER_AUTOMATE_WEBHOOK_URL" -H "Content-Type: application/json" -d "$(cat <<JSON
+  curl -fsS -X POST "$POWER_AUTOMATE_WEBHOOK_URL" -H "Content-Type: application/json; charset=utf-8" -d "$(cat <<JSON
 { "type":"message","attachments":[{"contentType":"application/vnd.microsoft.card.adaptive","content":{
   "type":"AdaptiveCard","\$schema":"http://adaptivecards.io/schemas/adaptive-card.json","version":"1.4",
   "body":[
