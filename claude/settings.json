@@ -1,5 +1,4 @@
 {
-  "tui": "fullscreen",
   "env": {
     "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "50"
   },
@@ -179,6 +178,7 @@
       "D:\\projects\\davaco\\ctv2026-mobile-apps"
     ]
   },
+  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -217,6 +217,5 @@
   "skipWorkflowUsageWarning": true,
   "theme": "dark-ansi",
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
-  "model": "opus"
+  "skipAutoPermissionPrompt": true
 }
