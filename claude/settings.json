@@ -178,7 +178,7 @@
       "D:\\projects\\davaco\\ctv2026-mobile-apps"
     ]
   },
-  "model": "fable",
+  "model": "sonnet",
   "hooks": {
     "SessionStart": [
       {
