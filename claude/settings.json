@@ -178,7 +178,7 @@
       "D:\\projects\\davaco\\ctv2026-mobile-apps"
     ]
   },
-  "model": "claude-fable-5[1m]",
+  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -211,6 +211,7 @@
       }
     }
   },
+  "effortLevel": "medium",
   "autoUpdatesChannel": "latest",
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
