@@ -201,13 +201,20 @@
     "ralph-loop@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
-    "document-skills@anthropic-agent-skills": true
+    "document-skills@anthropic-agent-skills": true,
+    "pr-resolve@davis-personal-plugins": true
   },
   "extraKnownMarketplaces": {
     "anthropic-agent-skills": {
       "source": {
         "source": "github",
         "repo": "anthropics/skills"
+      }
+    },
+    "davis-personal-plugins": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/dsylvester/davis-personal-plugins"
       }
     }
   },
